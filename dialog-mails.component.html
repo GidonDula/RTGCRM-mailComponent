@@ -1,0 +1,159 @@
+<div id="overlay" (click)="hideDialog()"></div>
+
+<div id="container">
+    <br/>
+    <br/>
+    <br/>
+    <br/>
+    <br/>
+    <div>
+        <button class="dialog-buttons" (click)="backToLeadsTable()">   <mat-icon >arrow_circle_left</mat-icon>
+             Back to leads Table</button>
+        <button class="cancel dialog-buttons" (click)="hideDialog()"> close-dialog</button>
+    </div>
+    <br/>
+    <br/>
+    <br/>
+
+    <div>
+        <form style="width: 50%; margin-left:30%; " [formGroup]="myForm">
+            <mat-form-field appearance="fill">
+                <mat-label>Select To Send Emails or SMS</mat-label>
+                <mat-select formControlName="selectedItem" (ngModelChange)="onChange($event)">
+                    <mat-option *ngFor="let option  of deliveryOptions" [value]="option">
+                        {{option}}
+                    </mat-option>
+                </mat-select>
+            </mat-form-field>
+        </form>
+    </div>
+
+    <form class="row" [formGroup]="smsForm" *ngIf="smsSelected" (ngSubmit)="onSMSSubmit(smsForm.value)">
+        <div class="col-2">
+        </div>
+        <mat-form-field appearance="legacy" class="col-6">
+            <mat-label>message</mat-label>
+            <textarea matInput cdkTextareaAutosize #autosize="cdkTextareaAutosize" cdkAutosizeMinRows="1" cdkAutosizeMaxRows="5" name="message" id="message" formControlName="message"></textarea>
+        </mat-form-field>
+        <div class="col-4">
+            <button mat-raised-button type="submit" [disabled]="!smsForm.valid" value="send" class="button-blue-outline">sendSMS</button>
+        </div>
+        <div class="row" *ngIf="smsSucsess">
+            <p *ngFor="let phone of sentPhones" style="margin-left:10%;" class="col-3">sms to{{phone.fullName}} with phone {{phone.phone}} sent sucseessfully </p>
+        </div>
+        <div class="row" *ngIf="smsError">
+            <p *ngFor="let phone of failedPhones" style="margin-left:10%;" class="col-3">error sending sms to {{phone.fullName}} with phone {{phone.phone}} </p>
+        </div>
+    </form>
+
+    <form *ngIf="mailSelected" method="post" enctype="multipart/form-data" [formGroup]="emailFileForm">
+        <div class="row">
+            <div class="col-2">
+
+            </div>
+            <div class="col-4">
+                <label for="PDF">PDF-File</label>
+                <input type="file" id="fileInput" name="fileInput" placeholder="fileInput" formControlName="fileInput" (change)="fileChangeEmailForm($event)">
+            </div>
+            <div class="col-4">
+                <button mat-raised-button type="submit" (click)="uploadFileEmailFormToServer()">upload-file</button>
+            </div>
+        </div>
+    </form>
+
+    <form class="row" [formGroup]="emailForm" *ngIf=" mailSelected" (ngSubmit)="onEmailSubmit(emailForm.value)">
+        <div class="col-2">
+
+        </div>
+        <mat-form-field class="col-3" appearance="legacy">
+            <mat-label>subject</mat-label>
+            <input type="text" matInput name="subject" placeholder="subject" formControlName="subject">
+        </mat-form-field>
+        <mat-form-field class="col-3" appearance="legacy">
+            <mat-label>html</mat-label>
+            <input type="text" matInput name="html" placeholder="html" formControlName="html">
+        </mat-form-field>
+        <div class="col-3">
+            <button mat-raised-button type="submit" [disabled]="!emailForm.valid" value="send" class="button-blue-outline">sendEmail</button>
+        </div>
+        <div class="row" *ngIf="emailAttachSucsess">
+            <p class="col-3" style="margin-left:10%;" *ngFor="let email of sentEmailsAttach"> email to {{email.fullName}} with mail {{email.email}} sent susessfully</p>
+        </div>
+        <div class="row" *ngIf="emailAttachError">
+            <p *ngFor="let email of FailedEmailsAttach"> error sending email to {{email.fullName}} with mail {{email.email}}</p>
+        </div>
+        <div class="row" *ngIf="emailTextSucsess">
+            <p class="col-3" style="margin-left:10%;" *ngFor="let email of sentEmailsText"> email to {{email.fullName}} with mail {{email.email}} sent susessfully</p>
+        </div>
+        <div class="row" *ngIf="emailTextError">
+            <p class="col-3" style="margin-left:10%;" *ngFor="let email of FailedEmailsText"> error sending email to {{email.fullName}} with mail {{email.email}} </p>
+        </div>
+
+    </form>
+
+    <form *ngIf="smsMailsSelected" method="post" enctype="multipart/form-data" [formGroup]="emailSMSFileForm">
+        <div class="row">
+            <div class="col-2">
+
+            </div>
+            <div class="col-4">
+                <label for="PDF">PDF-File</label>
+                <input type="file" id="fileInput2" name="fileInput2" placeholder="fileInput2" formControlName="fileInput2" (change)="fileChangeEmailSMSForm($event)">
+            </div>
+            <div class="col-4">
+                <button mat-raised-button type="submit" (click)="uploadFileEmaiSMSlFormToServer()">upload-file</button>
+            </div>
+        </div>
+    </form>
+
+
+    <form class="row" *ngIf="smsMailsSelected" [formGroup]="smsMailForm" (ngSubmit)="onSMSMailSubmit(smsMailForm.value)">
+        <div class="col-2">
+
+        </div>
+        <mat-form-field appearance="legacy" class="col-2">
+            <mat-label>message</mat-label>
+            <textarea name="message2" matInput cdkTextareaAutosize #autosize="cdkTextareaAutosize" cdkAutosizeMinRows="1" cdkAutosizeMaxRows="5" id="message2" formControlName="message2"></textarea>
+        </mat-form-field>
+        <mat-form-field class="col-2" appearance="legacy">
+            <mat-label>subject</mat-label>
+            <input type="text" matInput name="subject2" placeholder="subject2" formControlName="subject2">
+        </mat-form-field>
+        <mat-form-field appearance="legacy" class="col-2">
+            <mat-label>html</mat-label>
+            <input type="text" matInput name="html2" placeholder="html2" formControlName="html2">
+        </mat-form-field>
+        <div class="col-2">
+            <button mat-raised-button type="submit" [disabled]="!smsMailForm.valid" value="send" class="button-blue-outline">sendEmail&SMS</button>
+        </div>
+        <div class="row" *ngIf="smsSucsess">
+            <p *ngFor="let phone of sentPhones" style="margin-left:10%;" class="col-3">sms to{{phone.fullName}} with phone {{phone.phone}} sent sucseessfully </p>
+        </div>
+        <div class="row" *ngIf="smsError">
+            <p *ngFor="let phone of failedPhones" style="margin-left:10%;" class="col-3">error sending sms to {{phone.fullName}} with phone {{phone.phone}} </p>
+        </div>
+        <br/>
+        <br/>
+        <br/>
+        <div class="row" *ngIf="emailAttachSucsess">
+            <p class="col-3" style="margin-left:10%;" *ngFor="let email of sentEmailsAttach"> email to {{email.fullName}} with mail {{email.email}} sent susessfully</p>
+        </div>
+        <div class="row" *ngIf="emailAttachError">
+            <p *ngFor="let email of FailedEmailsAttach"> error sending email to {{email.fullName}} with mail {{email.email}}</p>
+        </div>
+        <div class="row" *ngIf="emailTextSucsess">
+            <p class="col-3" style="margin-left:10%;" *ngFor="let email of sentEmailsText"> email to {{email.fullName}} with mail {{email.email}} sent susessfully</p>
+        </div>
+        <div class="row" *ngIf="emailTextError">
+            <p class="col-3" style="margin-left:10%;" *ngFor="let email of FailedEmailsText"> error sending email to {{email.fullName}} with mail {{email.email}} </p>
+        </div>
+    </form>
+
+
+
+
+
+
+
+
+</div>

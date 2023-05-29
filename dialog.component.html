@@ -1,0 +1,166 @@
+<div id="overlay" (click)="hideDialog()">
+</div>
+
+<div id="container">
+
+    <mat-card>
+        <mat-card-title>Leads List by product category</mat-card-title>
+        <div>
+            <br>
+            <br>
+            <br>
+            <div id="action">
+                <button class="cancel" (click)="hideDialog()" class="dialog-buttons"> close-dialog</button>
+                <button mat-button class="dialog-buttons" (click)="sendCheckedLeads()">Send Checked Leads </button>
+            </div>
+            <br>
+            <br>
+            <br>
+            <mat-card-subtitle>Filter Leads By Dates</mat-card-subtitle>
+            <form class="row" [formGroup]="datesForm" (ngSubmit)="twoDatesSubmit(datesForm.value)">
+
+                <mat-form-field appearance="legacy" class="col-4">
+                    <mat-label>Date 1</mat-label>
+                    <input matInput type="date" formControlName="date1" />
+                </mat-form-field>
+                <mat-form-field appearance="legacy" class="col-4">
+                    <mat-label>Date 2</mat-label>
+                    <input matInput type="date" formControlName="date2" />
+                </mat-form-field>
+
+                <div class="col-4">
+                    <button mat-raised-button type="submit" [disabled]="!datesForm.valid" value="send" class="button-blue-outline">Send</button>
+                </div>
+            </form>
+        </div>
+
+        <mat-card-subtitle>filter by params</mat-card-subtitle>
+
+        <mat-card-content>
+            <form action="" [formGroup]="filterForm">
+                <div class="row">
+                    <div class="col-2">
+                        <mat-form-field appearance="legacy">
+                            <mat-label>search-First-Name</mat-label>
+                            <input matInput type="text" formControlName="searchFirstName">
+                        </mat-form-field>
+                    </div>
+                    <div class="col-2">
+                        <mat-form-field appearance="legacy">
+                            <mat-label>search-Last-Name</mat-label>
+                            <input matInput type="text" formControlName="searchLastName">
+                        </mat-form-field>
+                    </div>
+                    <div class="col-2">
+                        <mat-form-field appearance="legacy">
+                            <mat-label>search-Phone</mat-label>
+                            <input matInput type="text" formControlName="searchPhone">
+                        </mat-form-field>
+                    </div>
+                    <div class="col-2">
+                        <mat-form-field appearance="legacy">
+                            <mat-label>search-Email</mat-label>
+                            <input matInput type="text" formControlName="searchEmail">
+                        </mat-form-field>
+                    </div>
+                    <div class="col-2">
+                        <mat-form-field appearance="legacy">
+                            <mat-label>source</mat-label>
+                            <mat-select formControlName="searchSource">
+                                <mat-option *ngFor="let source of sources" [value]="source.source">
+                                    {{source.source}}
+                                </mat-option>
+                            </mat-select>
+                        </mat-form-field>
+                    </div>
+                    <div class="col-2">
+                        <button class="mb-3" (click)="searchSubmit()" mat-mini-fab color="accent" matTooltip="Filter by params" aria-label="Icon Button">
+                                <mat-icon>filter_alt</mat-icon>
+                            </button>
+                    </div>
+                    <div class="col-2">
+                        <button *ngIf="filterSubmit" class="mb-3" (click)="cleanForm()" mat-mini-fab color="accent" matTooltip="Clean" aria-label="Icon Button">
+                                <mat-icon>clear</mat-icon>
+                            </button>
+                    </div>
+                    <div class="col-2">
+                        <button *ngIf="filterSubmit" class="mb-3" (click)="getLeadsPerProductCategory()" mat-raised-button class="button-blue-outline">
+                               back to All Leads
+                            </button>
+                    </div>
+                </div>
+            </form>
+        </mat-card-content>
+
+        <div>
+            <div>
+                <h2>checked Leads</h2>
+            </div>
+            <div class="row">
+                <div *ngFor="let lead of checkedLeads" class="col-2">
+                    <button class="btn-icon-clear" (click)=" removeLeadFromCheckedList(lead)" mat-mini-fab color="accent" matTooltip="Clean" aria-label="Icon Button"> <mat-icon  class="icon-clear-checked-list">clear</mat-icon></button> <span>    first_name: {{lead.first_name}}</span>                    <span>  last_name: {{lead.last_name}}</span>
+                </div>
+                <button style="margin-left:30px ;" *ngIf="btnMore" (click)="moreLeadsClick()">more</button>
+            </div>
+        </div>
+
+        <div id="CoursesTable">
+            <div>
+                <h2>all Leads</h2>
+            </div>
+            <table>
+                <tr>
+                    <mat-checkbox (change)="checkLeads($event)" [checked]="allLeadsCheck===true"></mat-checkbox>
+                    <span>{{checkText}}</span>
+                </tr>
+            </table>
+
+            <table mat-table [dataSource]=" leadsPerProductCategory" matSort>
+                <ng-container matColumnDef="cb">
+                    <th mat-header-cell *matHeaderCellDef mat-sort-header> CheckBox </th>
+                    <td mat-cell *matCellDef="let row">
+                        <mat-checkbox (change)="showOptions($event,row)" [checked]="row.ischecked===true" [value]="row.ischecked"></mat-checkbox>
+                    </td>
+                </ng-container>
+                <ng-container matColumnDef="entry_timestamp">
+                    <th mat-header-cell *matHeaderCellDef>registery-date</th>
+                    <td mat-cell *matCellDef="let row">{{row.entry_timestamp.toDateString()}}</td>
+                </ng-container>
+                <ng-container matColumnDef="first_name">
+                    <th mat-header-cell *matHeaderCellDef>first_name</th>
+                    <td mat-cell *matCellDef="let row">{{row.first_name}}</td>
+                </ng-container>
+                <ng-container matColumnDef="last_name">
+                    <th mat-header-cell *matHeaderCellDef>last_name</th>
+                    <td mat-cell *matCellDef="let row">{{row.last_name}}</td>
+                </ng-container>
+                <ng-container matColumnDef="phone1">
+                    <th mat-header-cell *matHeaderCellDef> phone1</th>
+                    <td mat-cell *matCellDef="let row">{{row.phone_1}}</td>
+                </ng-container>
+                <ng-container matColumnDef="email">
+                    <th mat-header-cell *matHeaderCellDef>email</th>
+                    <td mat-cell *matCellDef="let row">{{row.email}}</td>
+                </ng-container>
+                <ng-container matColumnDef="source">
+                    <th mat-header-cell *matHeaderCellDef>source</th>
+                    <td mat-cell *matCellDef="let row">{{row.source}}</td>
+                </ng-container>
+                <ng-container matColumnDef="source_details">
+                    <th mat-header-cell *matHeaderCellDef>source_details</th>
+                    <td mat-cell *matCellDef="let row">{{row.source_details}}</td>
+                </ng-container>
+                <ng-container matColumnDef="status">
+                    <th mat-header-cell *matHeaderCellDef>status</th>
+                    <td mat-cell *matCellDef="let row">{{row.status}}</td>
+                </ng-container>
+                <ng-container matColumnDef="priority">
+                    <th mat-header-cell *matHeaderCellDef>priority</th>
+                    <td mat-cell *matCellDef="let row">{{row.priority}}</td>
+                </ng-container>
+                <tr mat-header-row *matHeaderRowDef="displayColums"></tr>
+                <tr mat-row *matRowDef="let row; columns:displayColums"></tr>
+            </table>
+        </div>
+    </mat-card>
+</div>

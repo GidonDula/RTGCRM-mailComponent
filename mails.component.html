@@ -1,0 +1,35 @@
+<app-dialog *ngIf="marketingService.showLeadsDialog"></app-dialog>
+
+<app-dialog-mails *ngIf="marketingService.showMailesDialog"></app-dialog-mails>
+
+<br/>
+<br/>
+<br/>
+<br/>
+
+<div class="row">
+    <div class="col-3">
+    </div>
+    <div style=" margin-left: 50px" *ngIf="!categorySelected" class="col-6">
+        <p> <strong> press on a button to choose its sub categories after that choose another button to send emails and SMS to relevantik leads  </strong> </p>
+    </div>
+    <div style=" margin-left: 50px" *ngIf="categorySelected" class="col-6">
+        <p> <strong> press on a button to send emails and SMS to relevantik leads </strong> </p>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-3">
+    </div>
+    <div *ngIf="!categorySelected" class="Board col-6">
+        <div *ngFor="let category of categories">
+            <button mat-button color="accent" *ngIf="!categorySelected" (click)="openButtonsByCategory(category.category)" class="cell categoryButtons">{{category.category}} </button>
+        </div>
+    </div>
+    <div *ngIf="categorySelected" class="col-6 Board">
+        <div *ngFor="let path of pathsForCategory">
+            <button class="cell pathButtons" (click)=" openPopUpByPathCategory(path.pathCode)">{{path.pathName}}</button>
+        </div>
+        <button class="cell pathButtons" (click)="backToCategories()"> back-to-categories</button>
+    </div>
+</div>
